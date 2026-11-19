@@ -1,9 +1,9 @@
 "use client";
 
-import { useEffect, useEffectEvent, useImperativeHandle, useMemo, useRef, useState, type CSSProperties, type Ref } from "react";
+import { useEffect, useEffectEvent, useImperativeHandle, useMemo, useRef, useState, useSyncExternalStore, type CSSProperties, type Ref } from "react";
 import { cn } from "@/lib/cn";
 import { formatInfo } from "@/lib/forma-constants";
-import { frameUrl, isTimeMessage, type FrameParams, type PlayerCommand, type TimeMessage } from "@/lib/player/protocol";
+import { frameUrl, isTimeMessage, playerOriginProblem, type FrameParams, type PlayerCommand, type TimeMessage } from "@/lib/player/protocol";
 import { frameQueue } from "@/lib/player/load-queue";
 import { DEFAULT_FPS, renderScaleFor, shouldRerender } from "@/lib/player/render-hints";
 import { AlertIcon } from "@/components/ui/icons";
@@ -88,6 +88,9 @@ const HELLO_AFTER_MS = 3000;
 /** Shown much smaller while playing: re-render lighter after this long (quick back-and-forth costs nothing). */
 const LIGHTER_AFTER_MS = 4000;
 
+const noSubscribe = () => () => {};
+let reportedProblem = false;
+
 const parse = (msg: TimeMessage): FrameState => ({
   ready: true,
   t: Number(msg.t) || 0,
@@ -148,6 +151,15 @@ export function CreativeFrame({
   const intent = useRef<boolean | null>(null);
   /** Releases the queue slot this frame holds while its newest layer starts. */
   const slot = useRef<(() => void) | null>(null);
+
+  /** A misconfigured player origin: load nothing (no local-network prompt), say why. */
+  const problem = useSyncExternalStore(noSubscribe, () => playerOriginProblem(window.location.hostname), () => null);
+  useEffect(() => {
+    if (problem && !reportedProblem) {
+      reportedProblem = true;
+      console.error(`[player] ${problem}`);
+    }
+  }, [problem]);
 
   const [near, setNear] = useState(!lazy);
   const [scale, setScale] = useState(0);
@@ -304,7 +316,7 @@ export function CreativeFrame({
 
   // Wait for our turn before starting a creative (near the viewport first, see `near`).
   useEffect(() => {
-    if (!near || url === null || grantedUrl === url) return;
+    if (!near || url === null || grantedUrl === url || problem) return;
     let granted = false;
     const release = frameQueue.request(priority, () => {
       granted = true;
@@ -315,7 +327,7 @@ export function CreativeFrame({
     return () => {
       if (!granted) release();
     };
-  }, [near, url, grantedUrl, priority]);
+  }, [near, url, grantedUrl, priority, problem]);
   useEffect(() => () => slot.current?.(), []);
 
   // Hidden or gone: stop and unload the creatives (a hidden page keeps its DOM, and
@@ -406,7 +418,7 @@ export function CreativeFrame({
   }, []);
 
   const posterSrc = svgDataUri(poster);
-  const showSkeleton = shownKey === null && !posterSrc && !unavailable;
+  const showSkeleton = shownKey === null && !posterSrc && !unavailable && !problem;
 
   return (
     <div
@@ -458,12 +470,12 @@ export function CreativeFrame({
             />
           );
         })}
-      {unavailable && shownKey === null && (
+      {(unavailable || problem) && shownKey === null && (
         <div className="absolute inset-0 grid place-items-center bg-gray/90 p-4 text-center">
           <div className="flex flex-col items-center gap-2 text-muted">
             <AlertIcon size={20} />
             <p className="text-small font-medium text-navy">This preview is unavailable</p>
-            <p className="text-caption">We&apos;ve been told. Try again in a moment.</p>
+            <p className="text-caption">{problem ? "The preview server isn't set up for this site yet." : "We've been told. Try again in a moment."}</p>
           </div>
         </div>
       )}

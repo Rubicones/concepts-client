@@ -51,3 +51,17 @@ describe("render hints", () => {
     expect(await asset.text()).toBe("binary");
   });
 });
+
+import { playerOriginProblem } from "./protocol";
+
+describe("player origin check", () => {
+  it("flags the local value shipped to a real site", () => {
+    expect(playerOriginProblem("concepts-client.vercel.app", "http://play.localhost:3000")).toMatch(/local address/);
+    expect(playerOriginProblem("concepts-client.vercel.app", "")).toMatch(/not set/);
+    expect(playerOriginProblem("app.example.com", "https://app.example.com")).toMatch(/separate host/);
+  });
+  it("accepts a proper split, and localhost while developing", () => {
+    expect(playerOriginProblem("concepts-client.vercel.app", "https://concepts-client-play.vercel.app")).toBeNull();
+    expect(playerOriginProblem("localhost", "http://play.localhost:3000")).toBeNull();
+  });
+});

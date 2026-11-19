@@ -112,4 +112,13 @@ Tests cover the questionnaire logic, both state machines, brief validation, the 
 
 ## Deploy (Vercel)
 
-One Vercel project, root directory = this app, two domains: the app (`app.<domain>`) and the player (`play.<domain>`). Set `NEXT_PUBLIC_PLAYER_ORIGIN=https://play.<domain>` and the variables above. The proxy reads the player host from that variable at build time.
+One Vercel project, root directory = this app, **two domains** on it: the app and the player. The player must be a different host from the app.
+
+- With your own domain: `app.<domain>` and `play.<domain>`.
+- On vercel.app only: add a second free domain to the same project (Settings → Domains), e.g. `concepts-client.vercel.app` (app) and `concepts-client-play.vercel.app` (player). vercel.app is a public suffix, so the two are separate sites, which isolates creatives even better.
+
+Then:
+1. Set `NEXT_PUBLIC_PLAYER_ORIGIN=https://<player domain>` for Production (and Preview), plus the variables above. Never the local `http://play.localhost:3000`: the browser would ask visitors to "access devices on your local network" and every preview fails (the app detects this and says so in the console).
+2. **Redeploy**: `NEXT_PUBLIC_*` values are baked in at build time, so changing them needs a new build.
+3. Check: `https://<player domain>/` answers 404 (it serves only `/p/*` and `/lib/*`).
+4. Allow the app origin on the R2 bucket (uploads and the download ZIP): `node --env-file=.env scripts/r2-cors.mjs http://localhost:3000 https://<app domain>`.

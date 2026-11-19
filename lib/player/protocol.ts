@@ -12,6 +12,27 @@
 
 export const PLAYER_ORIGIN = (process.env.NEXT_PUBLIC_PLAYER_ORIGIN ?? "").replace(/\/+$/, "");
 
+const isLocal = (host: string) => host === "localhost" || host.endsWith(".localhost") || /^127\.|^\[?::1\]?$/.test(host);
+
+/**
+ * Why creatives can't load on this page, or null. Catches the classic deploy slip:
+ * the local value (http://play.localhost:3000) shipped to a real site — the browser
+ * then asks to reach the visitor's own machine ("access devices on your local
+ * network") and every preview fails. NEXT_PUBLIC_* is baked in at build time.
+ */
+export function playerOriginProblem(pageHost: string, origin = PLAYER_ORIGIN): string | null {
+  let host: string;
+  try {
+    host = new URL(origin).hostname.toLowerCase();
+  } catch {
+    return "NEXT_PUBLIC_PLAYER_ORIGIN is not set.";
+  }
+  const page = pageHost.toLowerCase();
+  if (isLocal(host) && !isLocal(page)) return `NEXT_PUBLIC_PLAYER_ORIGIN points to ${host}, a local address, on ${page}. Set it to this site's player domain and redeploy (README → Deploy).`;
+  if (host === page) return "NEXT_PUBLIC_PLAYER_ORIGIN must be a separate host from the app (README → Deploy).";
+  return null;
+}
+
 export interface FrameParams {
   path: string;
   format: string;
