@@ -1,0 +1,89 @@
+{
+  "_note": "Sample exports for test mode (spec 6.8). Quarter-size placeholders; the simulator uploads them once per final and points every matching delivery_exports row at them. Add or replace files freely; format null = fallback for any format.",
+  "files": [
+    {
+      "file": "1x1.mp4",
+      "format": "1x1",
+      "type": "mp4",
+      "width": 270,
+      "height": 270
+    },
+    {
+      "file": "1x1.png",
+      "format": "1x1",
+      "type": "png",
+      "width": 270,
+      "height": 270
+    },
+    {
+      "file": "4x5.mp4",
+      "format": "4x5",
+      "type": "mp4",
+      "width": 270,
+      "height": 338
+    },
+    {
+      "file": "4x5.png",
+      "format": "4x5",
+      "type": "png",
+      "width": 270,
+      "height": 338
+    },
+    {
+      "file": "9x16.mp4",
+      "format": "9x16",
+      "type": "mp4",
+      "width": 270,
+      "height": 480
+    },
+    {
+      "file": "9x16.png",
+      "format": "9x16",
+      "type": "png",
+      "width": 270,
+      "height": 480
+    },
+    {
+      "file": "16x9.mp4",
+      "format": "16x9",
+      "type": "mp4",
+      "width": 480,
+      "height": 270
+    },
+    {
+      "file": "16x9.png",
+      "format": "16x9",
+      "type": "png",
+      "width": 480,
+      "height": 270
+    },
+    {
+      "file": "5x4.mp4",
+      "format": "5x4",
+      "type": "mp4",
+      "width": 338,
+      "height": 270
+    },
+    {
+      "file": "5x4.png",
+      "format": "5x4",
+      "type": "png",
+      "width": 338,
+      "height": 270
+    },
+    {
+      "file": "191x1.mp4",
+      "format": "191x1",
+      "type": "mp4",
+      "width": 300,
+      "height": 156
+    },
+    {
+      "file": "191x1.png",
+      "format": "191x1",
+      "type": "png",
+      "width": 300,
+      "height": 156
+    }
+  ]
+}

@@ -1,0 +1,262 @@
+@import "tailwindcss";
+
+/*
+ * Toggle Concepts design tokens (spec §2.3, brand book §6–§17).
+ * Tailwind's default palette and type scale are switched off on purpose:
+ * only these tokens exist, so nothing off-brand can slip in.
+ */
+
+@theme {
+  --color-*: initial;
+  --color-transparent: transparent;
+  --color-current: currentColor;
+  --color-white: #ffffff;
+  --color-black: #000000;
+
+  --color-navy: #0c2b3f;   /* ink */
+  --color-deep: #081f2e;
+  --color-sky: #b4e4fa;    /* highlight */
+  --color-ice: #f3fbff;    /* light gradient start */
+  --color-orange: #ff4f17; /* "needs your attention" and the current step only */
+  --color-gray: #f1f1f1;
+  --color-gray-strong: #e6eaed; /* gray hover (prototype .pill:hover) */
+  --color-muted: #5a6b78;
+  --color-mist: #bfd3e0;
+  --color-line: #dde3e8;
+  --color-hover: #1d4a66;  /* hover on navy */
+  --color-focus: #2c7be5;
+  --color-ok: #1f7a4d;
+  --color-err: #c8331a;
+  --color-ok-soft: #e7f3ec;
+  --color-err-soft: #fbebe7;
+  --color-orange-soft: #ffede6;
+
+  --font-*: initial;
+  --font-sans: var(--font-inter-tight), "Inter Tight", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, monospace;
+
+  /* Type scale: one family, deliberate steps. Headlines tighten, body never does. */
+  --text-*: initial;
+  --text-micro: 11px;
+  --text-micro--line-height: 14px;
+  --text-micro--letter-spacing: 0.08em;
+  --text-caption: 12px;
+  --text-caption--line-height: 16px;
+  --text-small: 13px;
+  --text-small--line-height: 18px;
+  --text-body: 15px;
+  --text-body--line-height: 22px;
+  --text-lead: 17px;
+  --text-lead--line-height: 26px;
+  --text-title-sm: 20px;
+  --text-title-sm--line-height: 26px;
+  --text-title-sm--letter-spacing: -0.01em;
+  --text-title: 28px;
+  --text-title--line-height: 32px;
+  --text-title--letter-spacing: -0.02em;
+  --text-display: 40px;
+  --text-display--line-height: 44px;
+  --text-display--letter-spacing: -0.03em;
+  --text-hero: 56px;
+  --text-hero--line-height: 56px;
+  --text-hero--letter-spacing: -0.035em;
+
+  --radius-*: initial;
+  --radius-tag: 8px;
+  --radius-input: 16px;
+  --radius-tile-sm: 20px;
+  --radius-tile: 24px;
+  --radius-card: 32px;
+  --radius-full: 999px;
+
+  --shadow-*: initial;
+  --shadow-pop: 0 1px 2px rgb(12 43 63 / 0.06), 0 12px 32px -8px rgb(12 43 63 / 0.18);
+  --shadow-sheet: 0 24px 64px -16px rgb(8 31 46 / 0.32);
+  --shadow-pin: 0 2px 6px rgb(8 31 46 / 0.35), 0 0 0 2px #ffffff;
+  --shadow-ring: 0 0 0 4px rgb(44 123 229 / 0.18);
+
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+  /* Every bare `transition-*` utility moves the prototype's way (spec §2.2). */
+  --default-transition-duration: 160ms;
+  --default-transition-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
+
+  --animate-shimmer: shimmer 1.6s var(--ease-in-out) infinite;
+  --animate-spin: spin 0.9s linear infinite;
+  --animate-fade-in: fade-in 200ms var(--ease-out);
+  --animate-pop-in: pop-in 180ms var(--ease-out);
+  --animate-toast-in: toast-in 320ms var(--ease-out);
+  --animate-toast-out: toast-out 200ms var(--ease-out) forwards;
+
+  @keyframes shimmer {
+    0% { background-position: 100% 0; }
+    100% { background-position: -100% 0; }
+  }
+  @keyframes spin {
+    to { transform: rotate(360deg); }
+  }
+  @keyframes fade-in {
+    from { opacity: 0; }
+  }
+  @keyframes pop-in {
+    from { opacity: 0; transform: translateY(4px) scale(0.98); }
+  }
+  @keyframes toast-in {
+    from { opacity: 0; transform: translateY(16px) scale(0.98); }
+  }
+  @keyframes toast-out {
+    to { opacity: 0; transform: translateY(8px) scale(0.98); }
+  }
+}
+
+:root {
+  /* Raw tokens, as named in the spec and the prototype, for inline styles and SVG. */
+  --navy: #0c2b3f; --deep: #081f2e; --sky: #b4e4fa; --orange: #ff4f17;
+  --gray: #f1f1f1; --muted: #5a6b78; --mist: #bfd3e0; --line: #dde3e8;
+  --hover: #1d4a66; --focus: #2c7be5; --ok: #1f7a4d; --err: #c8331a;
+  --hero-gradient: linear-gradient(180deg, #8ebfd8 0%, #6f9db7 26%, #38596f 56%, #0c2b3f 80%);
+  --light-gradient: linear-gradient(180deg, #f3fbff 0%, #b4e4fa 100%);
+  --ease: cubic-bezier(0.16, 1, 0.3, 1);
+  --gutter: 24px;
+  --page-max: 1440px;
+  color-scheme: light;
+}
+
+@layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+    text-rendering: optimizeLegibility;
+  }
+  body {
+    background: var(--color-white);
+    color: var(--color-navy);
+    font-family: var(--font-sans);
+    font-size: var(--text-body);
+    line-height: var(--text-body--line-height);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+  ::selection {
+    background: var(--color-sky);
+    color: var(--color-navy);
+  }
+  :focus-visible {
+    outline: 2px solid var(--color-focus);
+    outline-offset: 2px;
+  }
+  button, [role="button"] {
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+  }
+  button:disabled, [aria-disabled="true"] {
+    cursor: not-allowed;
+  }
+  h1, h2, h3, h4 {
+    text-wrap: balance;
+  }
+  p {
+    text-wrap: pretty;
+  }
+}
+
+@layer components {
+  /* Skeletons take the exact box of what they stand in for; this only paints. */
+  .skeleton {
+    background: linear-gradient(90deg, var(--color-gray) 0%, #f8f8f8 50%, var(--color-gray) 100%);
+    background-size: 200% 100%;
+    animation: var(--animate-shimmer);
+  }
+  /* Scrubber: a native range input (keyboard + screen readers for free), restyled. --p is the fill 0–100%. */
+  .scrub {
+    appearance: none;
+    width: 100%;
+    height: 20px;
+    background: transparent;
+    cursor: pointer;
+    --p: 0%;
+  }
+  .scrub::-webkit-slider-runnable-track {
+    height: 4px;
+    border-radius: 999px;
+    background: linear-gradient(90deg, var(--scrub-fill, var(--color-navy)) var(--p), var(--scrub-track, var(--color-line)) var(--p));
+  }
+  .scrub::-moz-range-track {
+    height: 4px;
+    border-radius: 999px;
+    background: linear-gradient(90deg, var(--scrub-fill, var(--color-navy)) var(--p), var(--scrub-track, var(--color-line)) var(--p));
+  }
+  .scrub::-webkit-slider-thumb {
+    appearance: none;
+    width: 14px;
+    height: 14px;
+    margin-top: -5px;
+    border-radius: 999px;
+    background: var(--scrub-thumb, var(--color-navy));
+    box-shadow: 0 0 0 3px var(--scrub-ring, #fff);
+    transition: transform 120ms var(--ease);
+  }
+  .scrub::-moz-range-thumb {
+    width: 14px;
+    height: 14px;
+    border: 0;
+    border-radius: 999px;
+    background: var(--scrub-thumb, var(--color-navy));
+    box-shadow: 0 0 0 3px var(--scrub-ring, #fff);
+  }
+  .scrub:hover::-webkit-slider-thumb,
+  .scrub:active::-webkit-slider-thumb {
+    transform: scale(1.2);
+  }
+  .scrub:focus-visible {
+    outline: none;
+  }
+  .scrub:focus-visible::-webkit-slider-thumb {
+    box-shadow: 0 0 0 3px #fff, 0 0 0 5px var(--color-focus);
+  }
+  .scrub:focus-visible::-moz-range-thumb {
+    box-shadow: 0 0 0 3px #fff, 0 0 0 5px var(--color-focus);
+  }
+  .scrub:disabled {
+    cursor: not-allowed;
+    opacity: 0.5;
+  }
+  .hero-gradient {
+    background: var(--hero-gradient);
+  }
+  .light-gradient {
+    background: var(--light-gradient);
+  }
+  /* Kicker: the small caps label above page titles, as on the website. */
+  .kicker {
+    font-size: var(--text-micro);
+    line-height: var(--text-micro--line-height);
+    letter-spacing: var(--text-micro--letter-spacing);
+    text-transform: uppercase;
+    font-weight: 600;
+    color: var(--color-muted);
+  }
+}
+
+@keyframes waiting-drift {
+  from { background-position: 0% 40%; }
+  to { background-position: 100% 60%; }
+}
+
+/* Reduced motion: fades stay, movement goes (spec §2.2). */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 1ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+  }
+  .skeleton {
+    animation: none;
+  }
+  /* Fade only: colour and opacity still ease, nothing slides, scales or grows. */
+  *, *::before, *::after {
+    transition-property: color, background-color, border-color, outline-color, opacity, box-shadow, fill, stroke !important;
+  }
+  .motion-safe-transform {
+    transform: none !important;
+  }
+}
